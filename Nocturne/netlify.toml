@@ -1,0 +1,27 @@
+# Nocturne — Netlify config
+# Static site, no build step. Drop this at the repo root alongside index.html.
+
+[build]
+  publish = "."
+  command = ""
+
+# Forms are detected from the static HTML at deploy time.
+# The <form> must carry data-netlify="true" and a hidden form-name input — both are in index.html.
+
+[[headers]]
+  for = "/*"
+  [headers.values]
+    X-Frame-Options = "SAMEORIGIN"
+    X-Content-Type-Options = "nosniff"
+    Referrer-Policy = "strict-origin-when-cross-origin"
+    Permissions-Policy = "geolocation=(), microphone=(), camera=()"
+
+[[headers]]
+  for = "/*.html"
+  [headers.values]
+    Cache-Control = "public, max-age=0, must-revalidate"
+
+[[headers]]
+  for = "/assets/*"
+  [headers.values]
+    Cache-Control = "public, max-age=31536000, immutable"

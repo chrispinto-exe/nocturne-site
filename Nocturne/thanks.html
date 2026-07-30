@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Thanks — Nocturne</title>
+<meta name="robots" content="noindex">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#0A0A0C;--text:#EDEBE7;--muted:#8E8B85;--accent:#C8A96B;--line:#26262B;color-scheme:dark}
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:var(--bg);color:var(--text);font-family:'Inter',-apple-system,Helvetica,sans-serif;
+  min-height:100vh;display:grid;place-items:center;text-align:center;padding:32px;line-height:1.65}
+.glow{position:fixed;top:-10%;left:50%;transform:translateX(-50%);width:min(820px,120vw);height:560px;pointer-events:none;
+  background:radial-gradient(ellipse at center,rgba(200,169,107,.16),transparent 68%);filter:blur(22px)}
+main{position:relative;max-width:44ch;animation:up .8s cubic-bezier(.19,1,.22,1) both}
+@keyframes up{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:none}}
+.tick{width:62px;height:62px;border-radius:50%;border:1px solid rgba(200,169,107,.5);display:grid;place-items:center;
+  margin:0 auto 26px;color:var(--accent);font-size:24px}
+h1{font-weight:300;font-size:clamp(30px,5vw,46px);letter-spacing:-.035em;line-height:1.08;margin-bottom:16px}
+p{color:var(--muted);margin-bottom:32px}
+a{display:inline-block;text-decoration:none;padding:13px 26px;border-radius:999px;font-size:14px;font-weight:500;
+  background:var(--text);color:var(--bg);transition:background .35s ease}
+a:hover{background:var(--accent)}
+</style>
+</head>
+<body>
+<div class="glow"></div>
+<main>
+  <div class="tick">✓</div>
+  <h1>Thanks — that's landed.</h1>
+  <p>We read every enquiry properly. Expect a fixed quote back the same working day, from a real address.</p>
+  <a href="/">Back to the site</a>
+</main>
+</body>
+</html>
