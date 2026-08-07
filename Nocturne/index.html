@@ -67,7 +67,8 @@
 html{scroll-behavior:smooth;-webkit-text-size-adjust:100%}
 html.lock{overflow:hidden}
 body{background:var(--bg);color:var(--text);font-family:var(--sans);font-size:16px;font-weight:400;
-  line-height:1.65;-webkit-font-smoothing:antialiased;overflow-x:hidden;
+  line-height:1.65;-webkit-font-smoothing:antialiased;
+  overflow-x:hidden;overflow-x:clip;   /* clip doesn't create a scroll container, so sticky survives */
   -webkit-tap-highlight-color:transparent;
   transition:background .5s var(--ease),color .5s var(--ease)}
 .wrap{max-width:1120px;margin:0 auto;padding:0 var(--gut)}
@@ -136,7 +137,7 @@ summary:focus-visible,.tab:focus-visible{outline:2px solid var(--accent);outline
 @keyframes drift{
   0%{transform:translateX(-50%) translate(-30px,-10px) scale(1)}
   100%{transform:translateX(-50%) translate(34px,16px) scale(1.1)}}
-.hero>*:not(.glow){position:relative}
+.hero>*:not(.glow){position:relative;z-index:2}
 .pill{display:inline-flex;align-items:center;gap:9px;border:1px solid var(--line);background:var(--surface);
   border-radius:999px;padding:7px 16px;font-size:12.5px;color:var(--muted)}
 .pill i{width:6px;height:6px;border-radius:50%;background:var(--accent);animation:pulse 2.6s ease-in-out infinite;flex:none}
@@ -348,6 +349,63 @@ form{margin-top:24px}
 .done h3{font-size:clamp(21px,4vw,25px);font-weight:300;margin-bottom:10px}
 .done p{color:var(--muted);font-size:14.5px;max-width:36ch;margin:0 auto 24px}
 
+/* ═══ 01 — MANIFESTO, SCROLL-FOCUSED TEXT ════════ */
+.manifesto{padding:clamp(78px,15vw,168px) 0;text-align:center}
+#manif{font-size:clamp(22px,4.4vw,42px);font-weight:300;letter-spacing:-.03em;line-height:1.34;
+  max-width:23ch;margin:0 auto}
+#manif span{display:inline-block;filter:blur(11px);opacity:.14;will-change:filter,opacity}
+.rm #manif span{filter:none;opacity:1}
+
+/* ═══ 02 — PINNED PROCESS SEQUENCE ═══════════════ */
+.pinwrap{height:260vh;position:relative}
+.pin{position:sticky;top:0;height:100svh;display:grid;place-items:center;overflow:hidden;
+  padding-top:clamp(56px,8vw,62px)}
+.pstep{position:absolute;left:50%;top:50%;width:min(660px,84vw);
+  transform:translate(-50%,-50%);text-align:center;opacity:0;
+  transition:opacity .45s var(--ease),transform .75s var(--ease)}
+.pstep .pnum{font-size:clamp(74px,17vw,158px);font-weight:300;letter-spacing:-.06em;
+  color:var(--accent);opacity:.2;line-height:1}
+.pstep h3{font-size:clamp(26px,5.4vw,48px);margin:-.34em 0 14px}
+.pstep p{color:var(--muted);max-width:44ch;margin:0 auto;font-size:clamp(15px,2.3vw,16.5px)}
+.pbar{position:absolute;left:0;bottom:0;height:2px;width:0;background:var(--accent);opacity:.7}
+.plabel{position:absolute;left:50%;bottom:26px;transform:translateX(-50%);white-space:nowrap}
+
+/* ═══ 03 — HORIZONTAL WORK GALLERY ═══════════════ */
+.hwrap{position:relative;height:200vh}
+.hstick{position:sticky;top:0;height:100svh;display:flex;align-items:center;overflow:hidden;width:100%}
+.htrack{display:flex;gap:clamp(14px,2.2vw,22px);padding:0 clamp(20px,8vw,120px);
+  width:max-content;will-change:transform}
+#work{padding-left:0;padding-right:0}
+.hcue{margin-top:clamp(18px,3vw,26px)}
+.hcard{flex:none;width:min(460px,78vw)}
+.hcue{display:flex;align-items:center;gap:12px;justify-content:center;margin-top:26px;
+  font-size:11px;letter-spacing:.2em;text-transform:uppercase;color:var(--muted)}
+.hcue i{display:block;width:44px;height:1px;background:var(--line);position:relative;overflow:hidden}
+.hcue i:after{content:'';position:absolute;inset:0;background:var(--accent);
+  transform:translateX(-100%);animation:cue 2.6s var(--ease) infinite}
+@keyframes cue{0%{transform:translateX(-100%)}60%,100%{transform:translateX(100%)}}
+
+/* ═══ 04 — UNMASKING IMAGES ══════════════════════ */
+.thumb{clip-path:inset(100% 0 0 0);transform:scale(1.07);
+  transition:clip-path 1.1s var(--ease),transform 1.1s var(--ease);
+  transition-delay:calc(var(--k,0) * 110ms)}
+.wcard.shown .thumb{clip-path:inset(0 0 0 0);transform:scale(1)}
+.rm .thumb{clip-path:none;transform:none}
+
+/* ═══ 05 — "VIEW" CURSOR ═════════════════════════ */
+#cur{position:fixed;top:0;left:0;z-index:70;width:82px;height:82px;border-radius:50%;
+  pointer-events:none;display:grid;place-items:center;background:var(--accent);color:#0A0A0C;
+  font-size:11px;letter-spacing:.14em;text-transform:uppercase;font-weight:500;
+  transform:translate(-50%,-50%) scale(0);transition:transform .5s var(--spring);will-change:transform}
+#cur.on{transform:translate(-50%,-50%) scale(1)}
+.nocur .hcard,.nocur .hcard *{cursor:none}
+
+/* ═══ 09 — CSS 3D TILT, FEATURED TIER ════════════ */
+.tiers{perspective:1500px}
+.tier.feat{transform-style:preserve-3d;will-change:transform}
+.tier.feat > *{transform:translateZ(26px)}
+.tier.feat .amt{transform:translateZ(46px)}
+
 /* ═══ RESPONSIVE ═════════════════════════════════ */
 @media(max-width:1080px){
   .qs{grid-template-columns:repeat(auto-fit,minmax(min(100%,270px),1fr))}
@@ -356,6 +414,20 @@ form{margin-top:24px}
   .shead{max-width:none}
   .wbar{padding:16px 18px}
   footer{flex-direction:column;align-items:flex-start;gap:16px}
+  /* pinned sequence → plain stacked steps */
+  .pinwrap{height:auto}
+  .pin{position:static;height:auto;padding:0;display:block}
+  .pstep{position:static;transform:none!important;opacity:1!important;width:auto;
+    padding:34px 0;border-bottom:1px solid var(--line)}
+  .pstep:last-of-type{border-bottom:none}
+  .pbar,.plabel{display:none}
+  /* horizontal gallery → native swipe carousel */
+  .hwrap{height:auto}
+  .hstick{position:static;height:auto;overflow-x:auto;scroll-snap-type:x mandatory;
+    -webkit-overflow-scrolling:touch;padding-bottom:14px;scrollbar-width:none}
+  .hstick::-webkit-scrollbar{display:none}
+  .htrack{transform:none!important;padding:0 var(--gut)}
+  .hcard{scroll-snap-align:center}
 }
 @media(max-width:560px){
   .row{grid-template-columns:1fr}
@@ -372,6 +444,8 @@ form{margin-top:24px}
 }
 /* touch devices: no hover-dependent affordances */
 @media(hover:none){
+  .tiers{perspective:none}
+  .tier.feat > *,.tier.feat .amt{transform:none}
   .wcard:hover,.card:hover,.tier:hover,.qq:hover{transform:none}
   .btn:hover:before{transform:translateY(101%)}
   .btn:hover{color:var(--bg);border-color:var(--text)}
@@ -426,14 +500,28 @@ form{margin-top:24px}
     </div></div>
   </section>
 
+  </div><!-- /wrap — the gallery runs full-bleed -->
+
   <section id="work">
-    <div class="shead rv"><span class="label">Selected work</span><h2>Sites we've shipped recently.</h2><p>Different industries, same standard. Every one delivered inside the quoted window.</p></div>
-    <div class="wgrid">
-      <a class="wcard rv tilt" style="--i:0" href="#"><div class="thumb"></div><div class="wbar"><h3>Fenwick &amp; Hale</h3><span>Law practice →</span></div></a>
-      <a class="wcard rv tilt" style="--i:1" href="#"><div class="thumb"></div><div class="wbar"><h3>Orlo Coffee</h3><span>Roastery &amp; shop →</span></div></a>
-      <a class="wcard rv tilt" style="--i:2" href="#"><div class="thumb"></div><div class="wbar"><h3>The Salt Room</h3><span>Wellness studio →</span></div></a>
-      <a class="wcard rv tilt" style="--i:3" href="#"><div class="thumb"></div><div class="wbar"><h3>Ardent Labs</h3><span>Software →</span></div></a>
+    <div class="wrap"><div class="shead rv"><span class="label">Selected work</span><h2>Sites we've shipped recently.</h2><p>Different industries, same standard. Every one delivered inside the quoted window.</p></div></div>
+    <div class="hwrap" id="hwrap">
+      <div class="hstick" id="hstick">
+        <div class="htrack" id="htrack">
+          <a class="wcard hcard" style="--k:0" href="#"><div class="thumb"></div><div class="wbar"><h3>Fenwick &amp; Hale</h3><span>Law practice</span></div></a>
+          <a class="wcard hcard" style="--k:1" href="#"><div class="thumb"></div><div class="wbar"><h3>Orlo Coffee</h3><span>Roastery &amp; shop</span></div></a>
+          <a class="wcard hcard" style="--k:2" href="#"><div class="thumb"></div><div class="wbar"><h3>The Salt Room</h3><span>Wellness studio</span></div></a>
+          <a class="wcard hcard" style="--k:3" href="#"><div class="thumb"></div><div class="wbar"><h3>Ardent Labs</h3><span>Software</span></div></a>
+          <a class="wcard hcard" style="--k:4" href="#"><div class="thumb"></div><div class="wbar"><h3>Northbourne</h3><span>Property</span></div></a>
+        </div>
+      </div>
     </div>
+    <div class="wrap"><div class="hcue rv"><i></i>Scroll to move through the work<i></i></div></div>
+  </section>
+
+  <div class="wrap"><!-- back into the centred column -->
+
+  <section class="manifesto">
+    <p id="manif">We take on four projects a month. Not because we couldn't handle more, but because the fifth one is where the care starts to thin out.</p>
   </section>
 
   <section>
@@ -447,10 +535,23 @@ form{margin-top:24px}
 
   <section>
     <div class="shead rv"><span class="label">Process</span><h2>Three steps from call to live.</h2></div>
-    <div class="trio">
-      <div class="card rv" style="--i:0"><span class="label acc">01 — Day zero</span><h3 style="margin-top:14px">Talk</h3><p>Thirty minutes on what the business does and who it needs to reach. Fixed quote back the same day.</p></div>
-      <div class="card rv" style="--i:1"><span class="label acc">02 — Days one to seven</span><h3 style="margin-top:14px">Build</h3><p>You review the real site in your browser, not a flat picture. Two rounds of changes included.</p></div>
-      <div class="card rv" style="--i:2"><span class="label acc">03 — Days eight to ten</span><h3 style="margin-top:14px">Launch</h3><p>Domain connected, analytics wired, speed tested. Handover doc and a recorded walkthrough.</p></div>
+    <div class="pinwrap" id="pinwrap">
+      <div class="pin">
+        <div class="pstep" data-s="0">
+          <div class="pnum">01</div><h3>Talk</h3>
+          <p>Thirty minutes on what the business does and who it needs to reach. Fixed quote back the same day.</p>
+        </div>
+        <div class="pstep" data-s="1">
+          <div class="pnum">02</div><h3>Build</h3>
+          <p>You review the real site in your browser within a week, not a flat picture of it. Two rounds of changes included.</p>
+        </div>
+        <div class="pstep" data-s="2">
+          <div class="pnum">03</div><h3>Launch</h3>
+          <p>Domain connected, analytics wired, speed tested. Handover doc and a recorded walkthrough, then it's yours.</p>
+        </div>
+        <span class="label plabel" id="plabel">Day zero</span>
+        <div class="pbar" id="pbar"></div>
+      </div>
     </div>
   </section>
 
@@ -460,7 +561,7 @@ form{margin-top:24px}
       <div class="tier rv" style="--i:0"><span class="label">One-pager</span><div class="amt">£950</div><span class="per">Fixed · live in 5 days</span>
         <ul><li>Single page built to convert</li><li>Copy shaped with you</li><li>Contact form &amp; analytics</li><li>Two revision rounds</li></ul>
         <button class="btn btn-o mag" data-open data-tier="one-pager">Choose</button></div>
-      <div class="tier feat rv" style="--i:1"><span class="label acc">Full site — most chosen</span><div class="amt">£2,400</div><span class="per">Fixed · live in 10 days</span>
+      <div class="tier feat rv" id="feat" style="--i:1"><span class="label acc">Full site — most chosen</span><div class="amt">£2,400</div><span class="per">Fixed · live in 10 days</span>
         <ul><li>Up to six pages</li><li>Bespoke design throughout</li><li>Editable by you</li><li>SEO foundations included</li><li>Two revision rounds</li></ul>
         <button class="btn mag" data-open data-tier="full-site">Choose</button></div>
       <div class="tier rv" style="--i:2"><span class="label">Bespoke</span><div class="amt">£5,000+</div><span class="per">From · timeline agreed</span>
@@ -507,6 +608,8 @@ form{margin-top:24px}
 
 
 <!-- ══ ENQUIRY MODAL ══════════════════════════════════════ -->
+<div id="cur" aria-hidden="true">View</div>
+
 <div class="overlay" id="ov" role="dialog" aria-modal="true" aria-labelledby="mtitle" hidden>
   <div class="modal" id="modal">
     <button class="close-x" id="mclose" aria-label="Close">✕</button>
@@ -793,6 +896,154 @@ form.addEventListener('submit', async e => {
   }
   btn.disabled = false; btn.textContent = 'Send enquiry';
 });
+})();
+
+/* ══════════════════════════════════════════════════════════
+   SCROLL & POINTER EFFECTS
+   01 manifesto blur-focus · 02 pinned process · 03 horizontal
+   work gallery · 04 unmasking thumbnails · 05 "View" cursor
+   09 CSS 3D tilt on the featured tier
+   All driven by one shared rAF-throttled scroll loop.
+   ══════════════════════════════════════════════════════════ */
+(() => {
+'use strict';
+const RM   = matchMedia('(prefers-reduced-motion: reduce)').matches;
+const FINE = matchMedia('(hover:hover) and (pointer:fine)').matches;
+const clamp = (v,a,b) => Math.min(Math.max(v,a),b);
+if (RM) document.documentElement.classList.add('rm');
+
+const frames = [];
+let tick = false;
+addEventListener('scroll', () => {
+  if (tick) return; tick = true;
+  requestAnimationFrame(() => { for (const f of frames) f(); tick = false; });
+}, { passive: true });
+let rz = null;
+addEventListener('resize', () => {
+  clearTimeout(rz);
+  rz = setTimeout(() => { for (const f of frames) f(); }, 140);
+}, { passive: true });
+
+/* ── 01 manifesto: words sharpen through the middle band ── */
+(() => {
+  const el = document.getElementById('manif');
+  if (!el) return;
+  el.innerHTML = el.textContent.trim().split(' ').map(w => `<span>${w}</span>`).join(' ');
+  if (RM) return;
+  const words = [...el.querySelectorAll('span')];
+  frames.push(() => {
+    const r = el.getBoundingClientRect();
+    if (r.bottom < -200 || r.top > innerHeight + 200) return;   // cheap cull
+    for (const w of words) {
+      const b = w.getBoundingClientRect();
+      const d = Math.abs(b.top + b.height/2 - innerHeight*0.5) / (innerHeight*0.42);
+      const t = clamp(1 - d, 0, 1);
+      w.style.filter  = `blur(${((1-t)*11).toFixed(2)}px)`;
+      w.style.opacity = (0.14 + t*0.86).toFixed(3);
+    }
+  });
+})();
+
+/* ── 02 pinned process sequence ─────────────────────────── */
+(() => {
+  const wrap = document.getElementById('pinwrap');
+  if (!wrap) return;
+  const pin   = wrap.querySelector('.pin');
+  const steps = [...wrap.querySelectorAll('.pstep')];
+  const bar   = document.getElementById('pbar');
+  const lab   = document.getElementById('plabel');
+  const LABS  = ['Day zero', 'Days one to seven', 'Days eight to ten'];
+  frames.push(() => {
+    if (getComputedStyle(pin).position !== 'sticky') return;   // mobile fallback is static
+    const r = wrap.getBoundingClientRect();
+    const span = r.height - innerHeight;
+    if (span <= 0) return;
+    const p = clamp(-r.top / span, 0, 1);
+    bar.style.width = (p*100).toFixed(2) + '%';
+    const idx = clamp(Math.floor(p * steps.length * 0.999), 0, steps.length - 1);
+    steps.forEach((s, i) => {
+      const on = i === idx;
+      s.style.opacity = on ? '1' : '0';
+      s.style.transform = `translate(-50%,-50%) translateY(${on ? 0 : (i < idx ? -34 : 34)}px)`;
+    });
+    if (lab) lab.textContent = LABS[idx];
+  });
+})();
+
+/* ── 03 horizontal work gallery ─────────────────────────── */
+(() => {
+  const wrap = document.getElementById('hwrap'), track = document.getElementById('htrack'),
+        stick = document.getElementById('hstick');
+  if (!wrap || !track) return;
+  let dist = 0;
+  function measure() {
+    if (getComputedStyle(stick).position !== 'sticky') { wrap.style.height = ''; dist = 0; return; }
+    dist = Math.max(track.scrollWidth - innerWidth, 0);
+    wrap.style.height = (innerHeight + dist) + 'px';   // 1:1 — no scroll-speed weirdness
+  }
+  frames.push(() => {
+    measure();
+    if (!dist) { track.style.transform = ''; return; }
+    const r = wrap.getBoundingClientRect();
+    const p = clamp(-r.top / (r.height - innerHeight), 0, 1);
+    track.style.transform = `translate3d(${(-p*dist).toFixed(1)}px,0,0)`;
+  });
+  addEventListener('load', measure);
+})();
+
+/* ── 04 unmasking thumbnails ────────────────────────────── */
+(() => {
+  const cards = [...document.querySelectorAll('.wcard')];
+  if (!cards.length) return;
+  if (RM) { cards.forEach(c => c.classList.add('shown')); return; }
+  const io = new IntersectionObserver(es => es.forEach(e => {
+    if (e.isIntersecting) { e.target.classList.add('shown'); io.unobserve(e.target); }
+  }), { threshold: .15 });
+  cards.forEach(c => io.observe(c));
+})();
+
+/* ── 05 "View" cursor inside the gallery ────────────────── */
+(() => {
+  const cur = document.getElementById('cur');
+  const cards = [...document.querySelectorAll('.hcard')];
+  if (!cur || !cards.length) return;
+  if (!FINE || RM) { cur.remove(); return; }
+  document.body.classList.add('nocur');
+  let x = innerWidth/2, y = innerHeight/2, cx = x, cy = y, on = false, raf = null;
+  function loop() {
+    cx += (x-cx)*.18; cy += (y-cy)*.18;
+    cur.style.left = cx.toFixed(1) + 'px';
+    cur.style.top  = cy.toFixed(1) + 'px';
+    raf = (Math.abs(x-cx) > .4 || Math.abs(y-cy) > .4 || on) ? requestAnimationFrame(loop) : null;
+  }
+  addEventListener('pointermove', e => {
+    x = e.clientX; y = e.clientY;
+    if (!raf) raf = requestAnimationFrame(loop);
+  }, { passive: true });
+  cards.forEach(c => {
+    c.addEventListener('pointerenter', () => { on = true; cur.classList.add('on'); if (!raf) raf = requestAnimationFrame(loop); });
+    c.addEventListener('pointerleave', () => { on = false; cur.classList.remove('on'); });
+  });
+})();
+
+/* ── 09 CSS 3D tilt, featured pricing tier only ─────────── */
+(() => {
+  const card = document.getElementById('feat');
+  if (!card || !FINE || RM) return;
+  card.addEventListener('pointermove', e => {
+    const r = card.getBoundingClientRect();
+    const px = (e.clientX-r.left)/r.width, py = (e.clientY-r.top)/r.height;
+    card.style.transition = 'transform .12s linear';
+    card.style.transform =
+      `perspective(1500px) rotateY(${((px-.5)*13).toFixed(2)}deg) rotateX(${((.5-py)*13).toFixed(2)}deg) translateY(-5px)`;
+  });
+  card.addEventListener('pointerleave', () => {
+    card.style.transition = 'transform .8s cubic-bezier(.19,1,.22,1)';
+    card.style.transform = '';
+  });
+})();
+
+for (const f of frames) f();
 })();
 </script>
 </body>

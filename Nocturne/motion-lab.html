@@ -1,0 +1,561 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Nocturne — Motion Lab</title>
+<meta name="robots" content="noindex">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#0A0A0C; --surface:#141417; --surface2:#1A1A1E; --line:#26262B;
+  --text:#EDEBE7; --muted:#8E8B85; --accent:#C8A96B;
+  --soft:rgba(200,169,107,.45); --faint:rgba(200,169,107,.08);
+  --ease:cubic-bezier(.19,1,.22,1); --spring:cubic-bezier(.34,1.4,.5,1);
+  color-scheme:dark;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--text);font-family:'Inter',-apple-system,Helvetica,sans-serif;
+  line-height:1.65;-webkit-font-smoothing:antialiased;overflow-x:hidden}
+.wrap{max-width:1080px;margin:0 auto;padding:0 clamp(20px,5vw,36px)}
+h1,h2,h3{font-weight:300;letter-spacing:-.035em;line-height:1.06}
+a{color:var(--accent)}
+.lab{font-size:11px;letter-spacing:.2em;text-transform:uppercase;color:var(--muted)}
+.acc{color:var(--accent)}
+
+/* intro */
+.intro{padding:clamp(70px,12vw,130px) 0 60px;position:relative}
+.intro h1{font-size:clamp(36px,7vw,72px);margin:20px 0 22px;max-width:16ch}
+.intro p{color:var(--muted);max-width:60ch;font-size:17px}
+.legend{display:flex;gap:10px;flex-wrap:wrap;margin-top:34px}
+.key{font-size:12px;border:1px solid var(--line);border-radius:999px;padding:6px 14px;color:var(--muted)}
+.key b{color:var(--accent);font-weight:500}
+
+/* effect blocks */
+.fx{border-top:1px solid var(--line);padding:clamp(50px,8vw,88px) 0}
+.fx-h{display:flex;align-items:flex-start;gap:18px;margin-bottom:12px;flex-wrap:wrap}
+.fx-n{font-size:13px;color:var(--accent);letter-spacing:.16em;padding-top:9px}
+.fx-h h2{font-size:clamp(24px,4vw,38px);flex:1;min-width:240px}
+.fx-desc{color:var(--muted);max-width:62ch;margin-bottom:10px}
+.tags{display:flex;gap:8px;flex-wrap:wrap;margin:16px 0 30px}
+.tag{font-size:11.5px;letter-spacing:.06em;border:1px solid var(--line);border-radius:6px;
+  padding:5px 10px;color:var(--muted)}
+.tag.free{border-color:var(--soft);color:var(--accent)}
+.tag.heavy{border-color:rgba(224,121,106,.45);color:#E0796A}
+.tag.pick{background:var(--faint);border-color:var(--soft);color:var(--accent)}
+.stage{background:var(--surface);border:1px solid var(--line);border-radius:16px;overflow:hidden;position:relative}
+.hint{font-size:12.5px;color:var(--muted);margin-top:12px;font-style:italic}
+
+/* ── 01 blur text ─────────────────────────── */
+#blurwrap{padding:clamp(40px,8vw,80px) clamp(24px,5vw,60px)}
+#blurtext{font-size:clamp(22px,3.6vw,38px);font-weight:300;letter-spacing:-.03em;line-height:1.3}
+#blurtext span{display:inline-block;filter:blur(12px);opacity:.15;transition:filter .1s linear,opacity .1s linear}
+
+/* ── 02 sticky pin ────────────────────────── */
+.pinwrap{height:280vh;position:relative}
+.pin{position:sticky;top:0;height:100vh;display:grid;place-items:center;overflow:hidden}
+.pin-inner{width:100%;max-width:760px;padding:0 24px}
+.pstep{position:absolute;left:50%;top:50%;width:min(700px,86vw);transform:translate(-50%,-50%);
+  text-align:center;opacity:0;transition:opacity .4s ease}
+.pstep .num{font-size:clamp(70px,16vw,150px);font-weight:100;letter-spacing:-.06em;color:var(--accent);
+  opacity:.22;line-height:1}
+.pstep h3{font-size:clamp(26px,5vw,46px);margin:-.35em 0 14px}
+.pstep p{color:var(--muted);max-width:44ch;margin:0 auto}
+.pbar{position:absolute;left:0;bottom:0;height:2px;background:var(--accent);width:0}
+
+/* ── 03 horizontal gallery ────────────────── */
+.hwrap{height:300vh;position:relative}
+.hstick{position:sticky;top:0;height:100vh;display:flex;align-items:center;overflow:hidden}
+.htrack{display:flex;gap:24px;padding-left:8vw;will-change:transform}
+.hcard{flex:none;width:min(420px,72vw);aspect-ratio:4/3;border-radius:14px;border:1px solid var(--line);
+  background:linear-gradient(150deg,#1C1C22,#0F0F13);position:relative;overflow:hidden;
+  display:flex;align-items:flex-end;padding:24px}
+.hcard:before{content:'';position:absolute;inset:0;
+  background:radial-gradient(circle at 32% 24%,rgba(200,169,107,.16),transparent 58%)}
+.hcard span{position:relative;font-size:18px;font-weight:300}
+.hcard i{position:relative;font-style:normal;color:var(--muted);font-size:12.5px;margin-left:auto}
+
+/* ── 04 clip reveal ───────────────────────── */
+.cgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,240px),1fr));gap:18px;padding:28px}
+.cshot{aspect-ratio:4/5;border-radius:12px;border:1px solid var(--line);overflow:hidden;position:relative}
+.cshot .fillbox{position:absolute;inset:0;background:linear-gradient(160deg,#232329,#101014);
+  clip-path:inset(100% 0 0 0);transition:clip-path 1.05s var(--ease),transform 1.05s var(--ease);
+  transform:scale(1.14)}
+.cshot.in .fillbox{clip-path:inset(0 0 0 0);transform:scale(1)}
+.cshot .fillbox:after{content:'';position:absolute;inset:0;
+  background:radial-gradient(circle at 40% 30%,rgba(200,169,107,.2),transparent 60%)}
+.cshot em{position:absolute;left:16px;bottom:14px;font-style:normal;font-size:13px;z-index:2;
+  opacity:0;transform:translateY(8px);transition:.7s var(--ease) .35s}
+.cshot.in em{opacity:1;transform:none}
+
+/* ── 05 cursor preview ────────────────────── */
+.clist{padding:14px 0}
+.crow{display:flex;justify-content:space-between;align-items:center;gap:18px;
+  padding:22px clamp(20px,4vw,40px);border-bottom:1px solid var(--line);cursor:pointer;
+  transition:background .4s var(--ease),padding-left .4s var(--ease)}
+.crow:last-child{border-bottom:none}
+.crow:hover{background:var(--faint);padding-left:calc(clamp(20px,4vw,40px) + 12px)}
+.crow h4{font-size:clamp(19px,3.4vw,28px);font-weight:300}
+.crow span{color:var(--muted);font-size:13px}
+#peek{position:fixed;top:0;left:0;width:230px;height:160px;border-radius:12px;pointer-events:none;
+  z-index:80;opacity:0;transform:translate(-50%,-50%) scale(.82) rotate(-4deg);
+  transition:opacity .35s var(--ease),transform .5s var(--spring);
+  border:1px solid var(--soft);overflow:hidden;
+  background:linear-gradient(150deg,#20202A,#0E0E12)}
+#peek.on{opacity:1;transform:translate(-50%,-50%) scale(1) rotate(-2deg)}
+#peek:after{content:'';position:absolute;inset:0;
+  background:radial-gradient(circle at 34% 26%,rgba(200,169,107,.24),transparent 62%)}
+#peek b{position:absolute;left:14px;bottom:12px;font-size:12px;font-weight:400;letter-spacing:.06em;z-index:2}
+
+/* ── 06 spotlight ─────────────────────────── */
+.spot{position:relative;height:min(460px,66vw);cursor:crosshair}
+.spot .layer{position:absolute;inset:0;display:grid;place-items:center;padding:30px;text-align:center}
+.spot .dark{background:var(--surface)}
+.spot .light{background:#F7F5F1;color:#17161A;
+  -webkit-mask-image:radial-gradient(circle 130px at var(--sx,-500px) var(--sy,-500px),#000 0 60%,transparent 78%);
+  mask-image:radial-gradient(circle 130px at var(--sx,-500px) var(--sy,-500px),#000 0 60%,transparent 78%)}
+.spot h3{font-size:clamp(22px,4.6vw,40px);max-width:18ch}
+.spot .light h3{color:#17161A}
+.spot small{display:block;margin-top:14px;color:var(--muted);font-size:13px}
+.spot .light small{color:#6B6862}
+
+/* ── 07 velocity type ─────────────────────── */
+#veltext{padding:clamp(46px,9vw,90px) clamp(24px,5vw,50px);font-size:clamp(30px,7vw,74px);
+  letter-spacing:-.045em;line-height:1.02;font-variation-settings:'wght' 200;
+  transition:font-variation-settings .28s var(--ease)}
+#velread{font-size:12px;color:var(--muted);padding:0 clamp(24px,5vw,50px) 26px}
+
+/* ── 08 scramble ──────────────────────────── */
+#scramwrap{padding:clamp(46px,9vw,88px) clamp(24px,5vw,50px)}
+#scram{font-size:clamp(26px,5.4vw,54px);letter-spacing:-.035em;line-height:1.12;min-height:2.2em}
+#scram .ch{display:inline-block;white-space:pre}
+#scram .ch.fx{color:var(--accent)}
+
+/* ── 09 3D tilt ───────────────────────────── */
+.tiltstage{padding:clamp(40px,7vw,70px);display:grid;place-items:center;perspective:1200px}
+.tcard{width:min(400px,84vw);aspect-ratio:5/6;border-radius:18px;border:1px solid var(--line);
+  background:linear-gradient(160deg,#1D1D24,#0D0D11);position:relative;transform-style:preserve-3d;
+  transition:transform .7s var(--ease);padding:30px;overflow:hidden}
+.tcard:before{content:'';position:absolute;inset:0;
+  background:radial-gradient(420px circle at var(--tx,50%) var(--ty,50%),rgba(200,169,107,.16),transparent 60%);
+  opacity:0;transition:opacity .4s ease}
+.tiltstage:hover .tcard:before{opacity:1}
+.tl{position:relative;transform-style:preserve-3d}
+.tl.a{transform:translateZ(40px)}
+.tl.b{transform:translateZ(70px)}
+.tl.c{transform:translateZ(22px)}
+.tcard .lab{margin-bottom:10px}
+.tcard h3{font-size:26px;margin-bottom:8px}
+.tcard p{color:var(--muted);font-size:14px;max-width:26ch}
+.tcard .chip{position:absolute;right:26px;bottom:26px;border:1px solid var(--soft);color:var(--accent);
+  border-radius:999px;padding:7px 15px;font-size:12px}
+
+/* ── 10 three.js ──────────────────────────── */
+#three{height:min(520px,72vw);position:relative;display:grid;place-items:center}
+#three canvas{display:block;width:100%;height:100%}
+#three .fallback{position:absolute;color:var(--muted);font-size:14px;text-align:center;padding:24px}
+
+/* verdict */
+.verdict{border-top:1px solid var(--line);padding:clamp(60px,9vw,100px) 0 clamp(80px,12vw,140px)}
+.verdict h2{font-size:clamp(28px,5vw,46px);margin:16px 0 30px;max-width:20ch}
+.plan{display:grid;gap:14px}
+.slot{display:grid;grid-template-columns:190px 1fr;gap:20px;border:1px solid var(--line);
+  border-radius:12px;padding:22px 24px;background:var(--surface)}
+.slot b{color:var(--accent);font-weight:400;font-size:14px;letter-spacing:.04em}
+.slot p{color:var(--muted);font-size:14.5px}
+.slot p strong{color:var(--text);font-weight:400}
+
+@media(max-width:700px){
+  .slot{grid-template-columns:1fr;gap:6px}
+  #peek{display:none}
+  .fx-n{padding-top:0}
+}
+@media(prefers-reduced-motion:reduce){
+  *{animation:none!important;transition-duration:.01ms!important}
+}
+</style>
+</head>
+<body>
+
+<div class="wrap">
+
+  <header class="intro">
+    <span class="lab">Nocturne — Motion Lab</span>
+    <h1>Ten interactions, live. Pick the ones worth building.</h1>
+    <p>Every effect below is running for real, not described. Scroll slowly, move your cursor over things. Each one is tagged with what it costs to build and where it would sit on your site. My shortlist is at the bottom — read it after you've formed your own view.</p>
+    <div class="legend">
+      <span class="key"><b>Free</b> — no libraries, no page-weight cost</span>
+      <span class="key"><b>Heavy</b> — needs a library, adds load time</span>
+      <span class="key"><b>Pick</b> — what I'd actually build</span>
+    </div>
+  </header>
+
+  <!-- 01 ────────────────────────────────────── -->
+  <article class="fx">
+    <div class="fx-h"><span class="fx-n">01</span><h2>Scroll-focused text</h2></div>
+    <p class="fx-desc">Words sharpen from blur as they pass the middle of the screen, so the sentence is read at the pace you set rather than all at once. Feels like the page is thinking alongside the reader.</p>
+    <div class="tags"><span class="tag free">Free</span><span class="tag pick">Pick</span><span class="tag">Best for: a manifesto line</span></div>
+    <div class="stage"><div id="blurwrap"><p id="blurtext">We take on four projects a month. Not because we can't handle more, but because the fifth one is where the care starts to thin out.</p></div></div>
+    <p class="hint">Scroll up and down through it — the effect is tied to position, not time.</p>
+  </article>
+
+  <!-- 02 ────────────────────────────────────── -->
+  <article class="fx">
+    <div class="fx-h"><span class="fx-n">02</span><h2>Pinned sequence</h2></div>
+    <p class="fx-desc">The section locks in place and the content advances as you scroll. Turns three process steps into something closer to a short film. This is the single most recognisable "expensive site" move of the last few years.</p>
+    <div class="tags"><span class="tag free">Free</span><span class="tag pick">Pick</span><span class="tag">Best for: the three-step process</span></div>
+    <div class="stage">
+      <div class="pinwrap" id="pinwrap"><div class="pin">
+        <div class="pin-inner">
+          <div class="pstep" data-s="0"><div class="num">01</div><h3>Talk</h3><p>Thirty minutes on what the business does and who it needs to reach.</p></div>
+          <div class="pstep" data-s="1"><div class="num">02</div><h3>Build</h3><p>You review the real site in your browser within a week, not a flat picture of it.</p></div>
+          <div class="pstep" data-s="2"><div class="num">03</div><h3>Launch</h3><p>Domain connected, analytics wired, speed tested. Then it's yours.</p></div>
+        </div>
+        <div class="pbar" id="pbar"></div>
+      </div></div>
+    </div>
+  </article>
+
+  <!-- 03 ────────────────────────────────────── -->
+  <article class="fx">
+    <div class="fx-h"><span class="fx-n">03</span><h2>Horizontal work gallery</h2></div>
+    <p class="fx-desc">Vertical scrolling drives sideways movement through the portfolio. Buys you a lot of room for large images without an endlessly long page, and it makes the work the event rather than a grid you skim past.</p>
+    <div class="tags"><span class="tag free">Free</span><span class="tag pick">Pick</span><span class="tag">Best for: selected work</span></div>
+    <div class="stage">
+      <div class="hwrap" id="hwrap"><div class="hstick"><div class="htrack" id="htrack">
+        <div class="hcard"><span>Fenwick &amp; Hale</span><i>Law</i></div>
+        <div class="hcard"><span>Orlo Coffee</span><i>Retail</i></div>
+        <div class="hcard"><span>The Salt Room</span><i>Wellness</i></div>
+        <div class="hcard"><span>Ardent Labs</span><i>Software</i></div>
+        <div class="hcard"><span>Northbourne</span><i>Property</i></div>
+      </div></div></div>
+    </div>
+  </article>
+
+  <!-- 04 ────────────────────────────────────── -->
+  <article class="fx">
+    <div class="fx-h"><span class="fx-n">04</span><h2>Unmasking images</h2></div>
+    <p class="fx-desc">Screenshots wipe upward into view while easing out of a slight zoom. Cheap to build, works everywhere, and it's the difference between a portfolio that arrives and one that just exists.</p>
+    <div class="tags"><span class="tag free">Free</span><span class="tag pick">Pick</span><span class="tag">Best for: any image on the site</span></div>
+    <div class="stage"><div class="cgrid" id="cgrid">
+      <div class="cshot"><div class="fillbox"></div><em>Fenwick &amp; Hale</em></div>
+      <div class="cshot"><div class="fillbox"></div><em>Orlo Coffee</em></div>
+      <div class="cshot"><div class="fillbox"></div><em>The Salt Room</em></div>
+    </div></div>
+  </article>
+
+  <!-- 05 ────────────────────────────────────── -->
+  <article class="fx">
+    <div class="fx-h"><span class="fx-n">05</span><h2>Cursor-carried preview</h2></div>
+    <p class="fx-desc">The work list stays as quiet type, and the screenshot travels with your cursor. Lets the portfolio read as a restrained index while still showing the work — very much the Marque direction's instinct, applied here.</p>
+    <div class="tags"><span class="tag free">Free</span><span class="tag pick">Pick</span><span class="tag">Desktop only — needs a fallback grid on mobile</span></div>
+    <div class="stage"><div class="clist" id="clist">
+      <div class="crow" data-p="Fenwick &amp; Hale"><h4>Fenwick &amp; Hale</h4><span>Law practice</span></div>
+      <div class="crow" data-p="Orlo Coffee"><h4>Orlo Coffee</h4><span>Roastery &amp; shop</span></div>
+      <div class="crow" data-p="The Salt Room"><h4>The Salt Room</h4><span>Wellness studio</span></div>
+      <div class="crow" data-p="Ardent Labs"><h4>Ardent Labs</h4><span>Software</span></div>
+    </div></div>
+    <p class="hint">Hover the rows.</p>
+  </article>
+
+  <!-- 06 ────────────────────────────────────── -->
+  <article class="fx">
+    <div class="fx-h"><span class="fx-n">06</span><h2>Spotlight reveal</h2></div>
+    <p class="fx-desc">Your cursor carries a torch that exposes a second layer underneath. The obvious use is demonstrating your own light and dark modes in one gesture — a small piece of showing-not-telling that says more about your craft than a paragraph would.</p>
+    <div class="tags"><span class="tag free">Free</span><span class="tag">Best for: a "what you get" moment</span></div>
+    <div class="stage"><div class="spot" id="spot">
+      <div class="layer dark"><div><h3>Every site ships in both light and dark.</h3><small>Move your cursor across this panel</small></div></div>
+      <div class="layer light"><div><h3>Every site ships in both light and dark.</h3><small>Same content. Same care. Both directions.</small></div></div>
+    </div></div>
+  </article>
+
+  <!-- 07 ────────────────────────────────────── -->
+  <article class="fx">
+    <div class="fx-h"><span class="fx-n">07</span><h2>Type that responds to scroll speed</h2></div>
+    <p class="fx-desc">The headline's weight thickens the faster you scroll and settles back to a hairline when you stop. Almost nobody notices it consciously, which is exactly why it works — it registers as quality rather than as an effect.</p>
+    <div class="tags"><span class="tag free">Free</span><span class="tag">Needs a variable font — Inter already is one</span></div>
+    <div class="stage">
+      <div id="veltext">we build the site.<br>you run the business.</div>
+      <div id="velread">weight — <span id="velnum">200</span></div>
+    </div>
+    <p class="hint">Scroll fast, then stop.</p>
+  </article>
+
+  <!-- 08 ────────────────────────────────────── -->
+  <article class="fx">
+    <div class="fx-h"><span class="fx-n">08</span><h2>Decoding headline</h2></div>
+    <p class="fx-desc">Characters churn through noise before locking into place. Distinctive, and it suits a studio that wants to feel technical — though it edges toward the flashy end and would look wrong used more than once.</p>
+    <div class="tags"><span class="tag free">Free</span><span class="tag">Use once, at most</span></div>
+    <div class="stage"><div id="scramwrap"><div id="scram" data-text="we build the site."></div></div></div>
+  </article>
+
+  <!-- 09 ────────────────────────────────────── -->
+  <article class="fx">
+    <div class="fx-h"><span class="fx-n">09</span><h2>3D without a library</h2></div>
+    <p class="fx-desc">Real perspective, built from CSS alone. The card tilts toward your cursor and the layers inside sit at different depths, so they slide against each other as it moves. Costs nothing and gets you most of the way to feeling three-dimensional.</p>
+    <div class="tags"><span class="tag free">Free</span><span class="tag pick">Pick</span><span class="tag">Best for: the featured pricing tier</span></div>
+    <div class="stage"><div class="tiltstage" id="tiltstage"><div class="tcard" id="tcard">
+      <div class="tl a"><span class="lab">Full site</span></div>
+      <div class="tl b"><h3>£2,400</h3><p>Six pages, bespoke throughout, live in ten working days.</p></div>
+      <div class="tl c chip">Most chosen</div>
+    </div></div></div>
+    <p class="hint">Move your cursor across the card slowly.</p>
+  </article>
+
+  <!-- 10 ────────────────────────────────────── -->
+  <article class="fx">
+    <div class="fx-h"><span class="fx-n">10</span><h2>Real 3D — WebGL</h2></div>
+    <p class="fx-desc">An actual 3D object: a wireframe form that turns as you scroll and leans toward your cursor. This is the ceiling of what's possible, and the honest trade is weight — Three.js is roughly 500 KB to 1 MB even trimmed, against zero for everything above it.</p>
+    <div class="tags"><span class="tag heavy">Heavy — 500 KB+</span><span class="tag">Best for: the hero, if anywhere</span></div>
+    <div class="stage"><div id="three"><div class="fallback" id="tfall">Loading the 3D renderer…</div></div></div>
+    <p class="hint">Scroll through it, and move your cursor across it.</p>
+  </article>
+
+  <!-- verdict ───────────────────────────────── -->
+  <section class="verdict">
+    <span class="lab">What I'd actually build</span>
+    <h2>Six free effects, placed deliberately. Then decide on 3D.</h2>
+    <div class="plan">
+      <div class="slot"><b>Hero</b><p><strong>Keep the type reveal, add scroll-velocity weight (07).</strong> The hero's job is to be read in five seconds. Anything heavier fights that.</p></div>
+      <div class="slot"><b>Selected work</b><p><strong>Horizontal gallery (03) with cursor-carried previews (05).</strong> These two together are the strongest pairing here — the work becomes the centrepiece without the page getting longer.</p></div>
+      <div class="slot"><b>Manifesto line</b><p><strong>Scroll-focused text (01).</strong> One sentence, revealed at reading pace, somewhere between the work and the pricing.</p></div>
+      <div class="slot"><b>Process</b><p><strong>Pinned sequence (02).</strong> Your three steps are already written for this. It's the most cinematic thing you can do for free.</p></div>
+      <div class="slot"><b>Pricing</b><p><strong>CSS 3D tilt (09) on the featured tier only.</strong> Tilting all three flattens the hierarchy you're trying to create.</p></div>
+      <div class="slot"><b>Images</b><p><strong>Unmasking reveal (04)</strong> everywhere, as the default. Invisible when it's working.</p></div>
+      <div class="slot"><b>On WebGL</b><p><strong>I'd hold off, and here's the honest reason.</strong> Your entire pitch is fast, clean sites shipped in ten days. A hero that costs a megabyte contradicts it, and every prospect on a phone pays that toll. If you want real 3D later, the case for it is a spinning render of an actual client site — something that <em>shows the work</em>. Abstract shapes are decoration, and decoration is what everyone else is doing.</p></div>
+    </div>
+  </section>
+
+</div>
+
+<div id="peek"><b></b></div>
+
+<script>
+const RM = matchMedia('(prefers-reduced-motion: reduce)').matches;
+const FINE = matchMedia('(hover:hover) and (pointer:fine)').matches;
+const clamp = (v,a,b) => Math.min(Math.max(v,a),b);
+/* progress of an element through the viewport: 0 entering, 1 leaving */
+function prog(el, pad = 0) {
+  const r = el.getBoundingClientRect();
+  return clamp((innerHeight - r.top - pad) / (innerHeight + r.height - pad*2), 0, 1);
+}
+const frames = [];
+let tick = false;
+addEventListener('scroll', () => {
+  if (tick) return; tick = true;
+  requestAnimationFrame(() => { frames.forEach(f => f()); tick = false; });
+}, { passive: true });
+addEventListener('resize', () => frames.forEach(f => f()), { passive: true });
+
+/* ── 01 blur text ─────────────────────────── */
+(() => {
+  const el = document.getElementById('blurtext');
+  el.innerHTML = el.textContent.trim().split(' ').map(w => `<span>${w}</span>`).join(' ');
+  const words = [...el.querySelectorAll('span')];
+  frames.push(() => {
+    words.forEach(w => {
+      const r = w.getBoundingClientRect();
+      const mid = r.top + r.height/2;
+      const d = Math.abs(mid - innerHeight*0.5) / (innerHeight*0.42);
+      const t = clamp(1 - d, 0, 1);
+      w.style.filter = `blur(${((1-t)*12).toFixed(2)}px)`;
+      w.style.opacity = (0.15 + t*0.85).toFixed(3);
+    });
+  });
+})();
+
+/* ── 02 pinned sequence ───────────────────── */
+(() => {
+  const wrap = document.getElementById('pinwrap'), bar = document.getElementById('pbar');
+  const steps = [...wrap.querySelectorAll('.pstep')];
+  frames.push(() => {
+    const r = wrap.getBoundingClientRect();
+    const p = clamp(-r.top / (r.height - innerHeight), 0, 1);
+    bar.style.width = (p*100) + '%';
+    const idx = clamp(Math.floor(p * steps.length * 0.999), 0, steps.length-1);
+    steps.forEach((s,i) => {
+      const on = i === idx;
+      s.style.opacity = on ? 1 : 0;
+      s.style.transform = `translate(-50%,-50%) translateY(${on ? 0 : (i < idx ? -30 : 30)}px)`;
+    });
+  });
+})();
+
+/* ── 03 horizontal gallery ────────────────── */
+(() => {
+  const wrap = document.getElementById('hwrap'), track = document.getElementById('htrack');
+  frames.push(() => {
+    const r = wrap.getBoundingClientRect();
+    const p = clamp(-r.top / (r.height - innerHeight), 0, 1);
+    const dist = Math.max(track.scrollWidth - innerWidth + innerWidth*0.16, 0);
+    track.style.transform = `translate3d(${-p*dist}px,0,0)`;
+  });
+})();
+
+/* ── 04 clip reveal ───────────────────────── */
+(() => {
+  const io = new IntersectionObserver(es => es.forEach((e,i) => {
+    if (e.isIntersecting) {
+      const el = e.target;
+      setTimeout(() => el.classList.add('in'), [...document.querySelectorAll('.cshot')].indexOf(el) * 130);
+      io.unobserve(el);
+    }
+  }), { threshold: .3 });
+  document.querySelectorAll('.cshot').forEach(el => io.observe(el));
+})();
+
+/* ── 05 cursor preview ────────────────────── */
+(() => {
+  if (!FINE) return;
+  const peek = document.getElementById('peek'), label = peek.querySelector('b');
+  let x = 0, y = 0, cx = 0, cy = 0, on = false;
+  document.querySelectorAll('.crow').forEach(row => {
+    row.addEventListener('pointerenter', () => {
+      on = true; label.innerHTML = row.dataset.p; peek.classList.add('on');
+    });
+    row.addEventListener('pointerleave', () => { on = false; peek.classList.remove('on'); });
+  });
+  addEventListener('pointermove', e => { x = e.clientX; y = e.clientY; }, { passive: true });
+  (function loop(){
+    cx += (x-cx)*.16; cy += (y-cy)*.16;
+    if (on) peek.style.left = cx+'px', peek.style.top = cy+'px';
+    requestAnimationFrame(loop);
+  })();
+})();
+
+/* ── 06 spotlight ─────────────────────────── */
+(() => {
+  const spot = document.getElementById('spot'), light = spot.querySelector('.light');
+  spot.addEventListener('pointermove', e => {
+    const r = spot.getBoundingClientRect();
+    light.style.setProperty('--sx', (e.clientX-r.left)+'px');
+    light.style.setProperty('--sy', (e.clientY-r.top)+'px');
+  });
+  spot.addEventListener('pointerleave', () => {
+    light.style.setProperty('--sx','-500px'); light.style.setProperty('--sy','-500px');
+  });
+})();
+
+/* ── 07 scroll velocity type ──────────────── */
+(() => {
+  const el = document.getElementById('veltext'), num = document.getElementById('velnum');
+  let last = scrollY, w = 200, target = 200;
+  addEventListener('scroll', () => {
+    const v = Math.abs(scrollY - last); last = scrollY;
+    target = clamp(200 + v*11, 200, 800);
+  }, { passive: true });
+  (function loop(){
+    target += (200-target)*.06;
+    w += (target-w)*.16;
+    el.style.fontVariationSettings = `'wght' ${Math.round(w)}`;
+    num.textContent = Math.round(w);
+    requestAnimationFrame(loop);
+  })();
+})();
+
+/* ── 08 scramble ──────────────────────────── */
+(() => {
+  const el = document.getElementById('scram'), text = el.dataset.text;
+  const POOL = '▚▞ABCDEFGHIJKLMNOPQRSTUVWXYZ01#*/\\';
+  el.innerHTML = [...text].map(c => `<span class="ch">${c === ' ' ? ' ' : c}</span>`).join('');
+  const chars = [...el.querySelectorAll('.ch')];
+  let playing = false;
+  function run() {
+    if (playing || RM) return; playing = true;
+    const t0 = performance.now(), per = 46, hold = 260;
+    (function step(t){
+      const e = t - t0; let done = true;
+      chars.forEach((c,i) => {
+        const start = i*per, end = start + hold;
+        if (e < start) { c.textContent = ' '; done = false; }
+        else if (e < end) { c.textContent = POOL[(Math.random()*POOL.length)|0]; c.classList.add('fx'); done = false; }
+        else { c.textContent = text[i]; c.classList.remove('fx'); }
+      });
+      if (!done) requestAnimationFrame(step); else playing = false;
+    })(t0);
+  }
+  new IntersectionObserver(es => { if (es[0].isIntersecting) run(); }, { threshold:.6 }).observe(el);
+  el.parentElement.addEventListener('click', run);
+})();
+
+/* ── 09 CSS 3D tilt ───────────────────────── */
+(() => {
+  const stage = document.getElementById('tiltstage'), card = document.getElementById('tcard');
+  if (!FINE) return;
+  stage.addEventListener('pointermove', e => {
+    const r = card.getBoundingClientRect();
+    const px = (e.clientX-r.left)/r.width, py = (e.clientY-r.top)/r.height;
+    card.style.transition = 'transform .12s linear';
+    card.style.transform = `rotateY(${(px-.5)*22}deg) rotateX(${(.5-py)*22}deg) translateZ(14px)`;
+    card.style.setProperty('--tx', px*100+'%');
+    card.style.setProperty('--ty', py*100+'%');
+  });
+  stage.addEventListener('pointerleave', () => {
+    card.style.transition = 'transform .7s cubic-bezier(.19,1,.22,1)';
+    card.style.transform = '';
+  });
+})();
+
+/* ── 10 three.js ──────────────────────────── */
+(() => {
+  const host = document.getElementById('three'), fall = document.getElementById('tfall');
+  const s = document.createElement('script');
+  s.src = 'https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js';
+  s.onerror = () => fall.textContent = 'Could not load the 3D library — you are probably offline. Everything above still works.';
+  s.onload = () => {
+    fall.remove();
+    const W = host.clientWidth, H = host.clientHeight;
+    const sc = new THREE.Scene();
+    const cam = new THREE.PerspectiveCamera(48, W/H, .1, 100); cam.position.z = 4.4;
+    const ren = new THREE.WebGLRenderer({ antialias:true, alpha:true });
+    ren.setPixelRatio(Math.min(devicePixelRatio, 2)); ren.setSize(W, H);
+    host.appendChild(ren.domElement);
+
+    const geo  = new THREE.IcosahedronGeometry(1.55, 1);
+    const mesh = new THREE.LineSegments(
+      new THREE.EdgesGeometry(geo),
+      new THREE.LineBasicMaterial({ color:0xC8A96B, transparent:true, opacity:.85 })
+    );
+    const core = new THREE.Mesh(geo, new THREE.MeshBasicMaterial({ color:0x0E0E12 }));
+    const dots = new THREE.Points(
+      new THREE.IcosahedronGeometry(2.5, 2),
+      new THREE.PointsMaterial({ color:0xEDEBE7, size:.028, transparent:true, opacity:.5 })
+    );
+    const grp = new THREE.Group(); grp.add(core, mesh); sc.add(grp, dots);
+
+    let mx = 0, my = 0, tx = 0, ty = 0, sp = 0;
+    host.addEventListener('pointermove', e => {
+      const r = host.getBoundingClientRect();
+      tx = ((e.clientX-r.left)/r.width - .5) * .7;
+      ty = ((e.clientY-r.top)/r.height - .5) * .7;
+    });
+    host.addEventListener('pointerleave', () => { tx = 0; ty = 0; });
+    frames.push(() => { sp = prog(host); });
+    addEventListener('resize', () => {
+      const w = host.clientWidth, h = host.clientHeight;
+      cam.aspect = w/h; cam.updateProjectionMatrix(); ren.setSize(w,h);
+    }, { passive:true });
+
+    let vis = true;
+    new IntersectionObserver(es => vis = es[0].isIntersecting, { threshold:0 }).observe(host);
+    (function loop(){
+      requestAnimationFrame(loop);
+      if (!vis) return;
+      mx += (tx-mx)*.06; my += (ty-my)*.06;
+      grp.rotation.y = sp * Math.PI * 2 + mx * 1.6;
+      grp.rotation.x = my * 1.2 + Math.sin(performance.now()*.0002)*.15;
+      dots.rotation.y = -sp * Math.PI * .8;
+      dots.rotation.x = my * .4;
+      ren.render(sc, cam);
+    })();
+  };
+  document.head.appendChild(s);
+})();
+
+frames.forEach(f => f());
+</script>
+</body>
+</html>
